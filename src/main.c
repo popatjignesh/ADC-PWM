@@ -252,6 +252,7 @@ void FirePWM(void)
 
 void delay_ms(unsigned int count)
 {
-
+    NOP();
+    NOP();
 }
 
