@@ -29,6 +29,8 @@ void DisablePWM4n6(void);
 void ConfigDutyCycle(void);
 void FirePWM(void);
 
+void delay_ms(unsigned int count);
+
 unsigned char temp8;
 unsigned char PWMH, PWML;
 unsigned char PreviousSW2status,SW2status;
@@ -246,5 +248,10 @@ void FirePWM(void)
         DisablePWM3n5();
         InitPWM4n6();
     }
+}
+
+void delay_ms(unsigned int count)
+{
+
 }
 
