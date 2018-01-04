@@ -145,6 +145,7 @@ void InitADC(void)
 	ADCON0bits.CHS = 0b010100;      //RC4 as an Analog Channel
 	ADCON0bits.ADON = 1;			//ADC is enabled
 	//Generate 1uSec Delay here
+    NOP();NOP();NOP();NOP();
 	ADCON0bits.GOnDONE = 1;			//Start ADC
 	while(ADCON0bits.GOnDONE);		//Wait till ADC Conversation complete
 	ADCresult = ADRES;				//Get ADC Result
@@ -252,7 +253,8 @@ void FirePWM(void)
 
 void delay_ms(unsigned int count)
 {
-    NOP();
-    NOP();
+    for(unsigned int i = 0; i < count; i++)
+    {
+        for(unsigned int j = 0; j < 2000; j++);
+    }
 }
-
