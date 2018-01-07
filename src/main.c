@@ -11,13 +11,14 @@
 
 #define SW1     PORTAbits.RA5       //SW1 Input PIN
 #define SW2     PORTAbits.RA4       //SW2 Input PIN
-#define ADC_IN  PORTCbits.RC4       //ADC Input PIN
+#define ADC_IN  PORTCbits.RC3       //ADC Input PIN
 
 #define PWM3    LATAbits.LATA2      //PWM3 Output PIN
 #define PWM4    LATCbits.LATC0      //PWM4 Output PIN
 #define PWM5    LATCbits.LATC1      //PWM5 Output PIN
 #define PWM6    LATCbits.LATC2      //PWM6 Output PIN
-
+#define LED1    LATCbits.LATC5      //LED1 Output PIN
+#define LED2    LATCbits.LATC4      //LED2 Output PIN
 
 void ConfigCLK(void);
 void InitIO(void);
@@ -28,7 +29,6 @@ void InitPWM4n6(void);
 void DisablePWM4n6(void);
 void ConfigDutyCycle(void);
 void FirePWM(void);
-
 void delay_ms(unsigned int count);
 
 unsigned char temp8;
@@ -51,6 +51,8 @@ void main()
     PWMH = PWML = 0;
     PreviousSW2status = SW2;
     PreviousADC = 0;
+
+    LED1 = LED2 = 0;
 
     if(SW1)
     {
@@ -124,12 +126,14 @@ void InitIO(void)
     
     TRISAbits.TRISA5 = 1;   //Define SW1 as an input
     TRISAbits.TRISA4 = 1;   //Define SW2 as an input
-    TRISCbits.TRISC4 = 1;   //Define ADC as an input
+    TRISCbits.TRISC3 = 1;   //Define ADC as an input
 
 	TRISAbits.TRISA2 = 0;   //Define PWM3 as an output
 	TRISCbits.TRISC0 = 0;   //Define PWM4 as an output
     TRISCbits.TRISC1 = 0;   //Define PWM5 as an output
     TRISCbits.TRISC2 = 0;   //Define PWM6 as an output
+    TRISCbits.TRISC5 = 0;   //Define LED1 as an output
+    TRISCbits.TRISC4 = 0;   //Define LED2 as an output
     
     LATA = 0;               //all pins output 0 value
 	LATC = 0;
@@ -137,12 +141,12 @@ void InitIO(void)
 
 void InitADC(void)
 {
-	TRISCbits.TRISC4 = 1;			//ADC Input PIN Enabled
-	ANSELCbits.ANSC4 = 1;			//Configure RC4 as an Analog channel
+	TRISCbits.TRISC3 = 1;			//ADC Input PIN Enabled
+	ANSELCbits.ANSC3 = 1;			//Configure RC3 as an Analog channel
 	ADCON1bits.ADFM = 0;			//Get Left justified result
 	ADCON1bits.ADCS = 0b001;		//ADC clock as Fosc/8
 	ADCON1bits.ADPREF = 0b00;		//Vdd as +Vref
-	ADCON0bits.CHS = 0b010100;      //RC4 as an Analog Channel
+	ADCON0bits.CHS = 0b010011;      //RC3 as an Analog Channel
 	ADCON0bits.ADON = 1;			//ADC is enabled
 	//Generate 1uSec Delay here
     NOP();NOP();NOP();NOP();
@@ -155,6 +159,9 @@ void InitPWM3n5(void)
 {
     TRISAbits.TRISA2 = 1;           //PWM3 Output PIN disabled
     TRISCbits.TRISC1 = 1;           //PWM5 Output PIN disabled
+
+    TRISCbits.TRISC5 = 1;           //LED1 Output PIN disabled
+    TRISCbits.TRISC4 = 1;           //LED2 Output PIN disabled
 
     PWM3CONbits.PWM3POL = 0;        //For PWM3 active high signal
     PWM5CONbits.PWM5POL = 0;        //For PWM5 active high signal
@@ -174,8 +181,14 @@ void InitPWM3n5(void)
     RA2PPS = 0x0B;                  //Map PWM3 on RA2 Pin
     RC1PPS = 0x0D;                  //Map PWM5 on RC1 Pin
 
+    TRISCbits.TRISC5 = 0;           //LED1 Output PIN enabled
+    TRISCbits.TRISC4 = 0;           //LED2 Output PIN enabled    
+
     PWM3CONbits.PWM3EN = 1;         //Enable PWM3
     PWM5CONbits.PWM5EN = 1;         //Enable PWM5
+
+    LED1 = 1;                       //make LED1 ON
+    LED2 = 0;                       //make LED2 OFF
 }
 
 void DisablePWM3n5(void)
@@ -185,6 +198,8 @@ void DisablePWM3n5(void)
     
     PWM3CONbits.PWM3EN = 0;         //Disable PWM3
     PWM5CONbits.PWM5EN = 0;         //Disable PWM5
+    
+    LED1 = 0;                       //make LED1 OFF
 }
 
 void InitPWM4n6(void)
@@ -192,6 +207,9 @@ void InitPWM4n6(void)
     TRISCbits.TRISC0 = 1;           //PWM4 Output PIN disabled
     TRISCbits.TRISC2 = 1;           //PWM6 Output PIN disabled
 
+    TRISCbits.TRISC5 = 1;           //LED1 Output PIN disabled
+    TRISCbits.TRISC4 = 1;           //LED2 Output PIN disabled
+    
     PWM4CONbits.PWM4POL = 0;        //For PWM4 active high signal
     PWM6CONbits.PWM6POL = 0;        //For PWM6 active high signal
 
@@ -210,8 +228,14 @@ void InitPWM4n6(void)
     RC0PPS = 0x0C;                  //Map PWM4 on RC0 Pin
     RC2PPS = 0x0E;                  //Map PWM6 on RC2 Pin
 
+    TRISCbits.TRISC5 = 0;           //LED1 Output PIN enabled
+    TRISCbits.TRISC4 = 0;           //LED2 Output PIN enabled
+
     PWM4CONbits.PWM4EN = 1;         //Enable PWM4
     PWM6CONbits.PWM6EN = 1;         //Enable PWM6
+    
+    LED1 = 0;                       //make LED1 OFF
+    LED2 = 1;                       //make LED2 ON    
 }
 
 void DisablePWM4n6(void)
@@ -221,8 +245,9 @@ void DisablePWM4n6(void)
     
     PWM4CONbits.PWM4EN = 0;         //Disable PWM4
     PWM6CONbits.PWM6EN = 0;         //Disable PWM6
-}
 
+    LED2 = 0;                       //make LED2 OFF
+}
 
 void ConfigDutyCycle(void)
 {
