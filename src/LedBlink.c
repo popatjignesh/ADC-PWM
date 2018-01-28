@@ -9,12 +9,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define _XTAL_FREQ 8000000
+
 #define LED1    LATCbits.LATC5      //LED1 Output PIN
 #define LED2    LATCbits.LATC4      //LED2 Output PIN
 
 void ConfigCLK(void);
 void InitIO(void);
-void delay_ms(unsigned int count);
+//void delay_ms(unsigned int count);
 
 
 void main()
@@ -31,7 +33,7 @@ void main()
     {
 		LED1 = ~LED1;
 		LED2 = ~LED2;
-		delay_ms(1000);
+		__delay_ms(1000);
 	}
 }
 
@@ -56,6 +58,7 @@ void InitIO(void)
 	LATC = 0;
 }
 
+/*
 void delay_ms(unsigned int count)
 {
     for(unsigned int i = 0; i < count; i++)
@@ -63,3 +66,4 @@ void delay_ms(unsigned int count)
         for(unsigned int j = 0; j < 2000; j++);
     }
 }
+*/

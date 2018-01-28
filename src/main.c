@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define _XTAL_FREQ 8000000
+
 #define SW1     PORTAbits.RA5       //SW1 Input PIN
 #define SW2     PORTAbits.RA4       //SW2 Input PIN
 #define ADC_IN  PORTCbits.RC3       //ADC Input PIN
@@ -29,7 +31,7 @@ void InitPWM4n6(void);
 void DisablePWM4n6(void);
 void ConfigDutyCycle(void);
 void FirePWM(void);
-void delay_ms(unsigned int count);
+//void delay_ms(unsigned int count);
 
 unsigned char temp8;
 unsigned char PWMH, PWML;
@@ -151,7 +153,7 @@ void InitADC(void)
 	ADCON0bits.CHS = 0b010011;      //RC3 as an Analog Channel
 	ADCON0bits.ADON = 1;			//ADC is enabled
 	//Generate 1uSec Delay here
-    NOP();NOP();NOP();NOP();
+    __delay_us(10);
 	ADCON0bits.GOnDONE = 1;			//Start ADC
 	while(ADCON0bits.GOnDONE);		//Wait till ADC Conversation complete
 	ADCresult = ADRES;				//Get ADC Result
@@ -268,6 +270,7 @@ void FirePWM(void)
     }
 }
 
+/*
 void delay_ms(unsigned int count)
 {
     for(unsigned int i = 0; i < count; i++)
@@ -275,3 +278,4 @@ void delay_ms(unsigned int count)
         for(unsigned int j = 0; j < 2000; j++);
     }
 }
+*/
